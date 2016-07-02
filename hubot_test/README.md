@@ -216,7 +216,7 @@ you're having issues.
 ## Starting
 
 1. Enter `bin/hubot` command
-2. Enter `hubot-test ping` command
+2. Enter `hubot-test hello` command
 3. If the hubot returns `PONG` response, it succeed!
 
 ## Refer to
