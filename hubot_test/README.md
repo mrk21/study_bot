@@ -217,9 +217,17 @@ you're having issues.
 
 1. Enter `bin/hubot` command
 2. Enter `hubot-test hello` command
-3. If the hubot returns `PONG` response, it succeed!
+3. If the hubot returns `world` response, it succeed!
+
+### Slack
+
+1. Enter `bin/hubot -a slack` command
+2. Post `@hubot-test hello` message on Slack
+3. If the hubot returns `world` response, it succeed!
 
 ## Refer to
 
 * [HUBOT](https://hubot.github.com/docs/)
 * [Yeoman で Hubot を作成して Heroku へデプロイし Slack と連携する - Qiita](http://qiita.com/hkusu/items/1dc7db9607ab8cb35150)
+* [SlackのBot(hubot)を作ってみる - Qiita](http://qiita.com/mochidamochiko/items/29c2d77715d8a1ff062a)
+* [hubotスクリプトの書き方とサンプル集 | mitc](http://blog.fumiz.me/2012/08/05/hubot-irc-bot-script/#respondhear)
