@@ -233,3 +233,4 @@ you're having issues.
 * [SlackのBot(hubot)を作ってみる - Qiita](http://qiita.com/mochidamochiko/items/29c2d77715d8a1ff062a)
 * [hubotスクリプトの書き方とサンプル集 | mitc](http://blog.fumiz.me/2012/08/05/hubot-irc-bot-script/#respondhear)
 * [hubotでbabel(es2015)する - Qiita](http://qiita.com/airtoxin/items/f4326a1afb18fda7f410)
+* [Hubotで定期タスクを動かす - Qiita](http://qiita.com/mats116/items/0164b37ffaa90f03f2a0)
