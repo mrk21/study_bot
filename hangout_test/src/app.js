@@ -1,5 +1,6 @@
 function init() {
   console.log('app init');
+  console.log('getEnabledParticipants', gapi.hangout.getEnabledParticipants());
 
   gapi.hangout.onParticipantsAdded.add(function (participants) {
     console.log('onParticipantsAdded', participants);
