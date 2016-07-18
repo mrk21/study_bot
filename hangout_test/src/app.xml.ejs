@@ -7,9 +7,18 @@
   <Content type="html">
     <![CDATA[
       <!DOCTYPE html>
-      <script src="//hangoutsapi.talkgadget.google.com/hangouts/_/api/hangout.js"></script>
-      <script src="<%= appUrl %>/app.js"></script>
-      <h1>Hello World!</h1>
+      <html>
+      <head>
+        <meta charset="UTF-8" />
+        <title>Hello World</title>
+      </head>
+      <body style="background: #fff;">
+        <h1>Hello World!</h1>
+        <ul id="participants"></ul>
+        <script src="//hangoutsapi.talkgadget.google.com/hangouts/_/api/hangout.js"></script>
+        <script src="<%= appUrl %>/app.js"></script>
+      </body>
+      </html>
     ]]>
   </Content>
 </Module>
