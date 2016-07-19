@@ -1,24 +1,34 @@
-function showParticipants() {
+function updateParticipants() {
   var participants = gapi.hangout.getParticipants();
   var ul = document.getElementById('participants');
+  ul.innerHTML = '';
 
   participants.forEach(function (participant) {
     var li = document.createElement('li');
-    console.log(participant.person.displayName);
     li.innerHTML = participant.person.displayName;
     ul.appendChild(li);
   });
 }
 
-function init() {
-  console.log('app init');
-  console.log('getEnabledParticipants', gapi.hangout.getEnabledParticipants());
-  showParticipants();
+function appendActivities(activity) {
+  var ol = document.getElementById('activities');
 
-  gapi.hangout.onParticipantsAdded.add(function (participants) {
-    console.log('onParticipantsAdded', participants);
-    showParticipants();
+  var li = document.createElement('li');
+  li.innerHTML = activity;
+  ol.appendChild(li);
+}
+
+function onParticipantsAdded(participants) {
+  participants.forEach(function (participant) {
+    appendActivities('Join ' + participant.person.displayName);
   });
+  updateParticipants();
+}
+
+function init() {
+  gapi.hangout.onParticipantsAdded.add(onParticipantsAdded);
+  updateParticipants();
+  appendActivities('Initialized');
 }
 
 gadgets.util.registerOnLoadHandler(function () {
