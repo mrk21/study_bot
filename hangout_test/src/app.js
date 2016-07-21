@@ -18,7 +18,8 @@ function appendActivities(activity) {
   ol.appendChild(li);
 }
 
-function onParticipantsAdded(participants) {
+function onParticipantsAdded() {
+  var participants = gapi.hangout.getParticipants();
   participants.forEach(function (participant) {
     appendActivities('Join ' + participant.person.displayName);
   });
