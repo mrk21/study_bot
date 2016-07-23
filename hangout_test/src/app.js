@@ -28,13 +28,13 @@ function getActivities() {
 function appendActivity(activity) {
   var activities = getActivities();
   activities.push(activity);
-  gapi.hangout.data.setValue('activity', JSON.stringify({activities: activities}));
+  console.log(activities);
+  gapi.hangout.data.setvalue('activities', JSON.stringify(activities));
   updateActivities();
 }
 
-function onParticipantsAdded() {
-  var participants = gapi.hangout.getParticipants();
-  participants.forEach(function (participant) {
+function onParticipantsAdded(participants) {
+  participants.addedParticipants.forEach(function (participant) {
     appendActivity('Join ' + participant.person.displayName);
   });
   updateParticipants();
@@ -45,10 +45,22 @@ function onStateChanged(addedKeys, metadata, removedKeys, state) {
   updateActivities();
 }
 
+function createDebugButton() {
+  var button = document.createElement('button');
+  button.innerHTML = 'click me!';
+  button.type = 'button';
+  button.onclick = function () {
+    console.log(getActivities());
+  };
+  document.body.appendChild(button);
+}
+
 function init() {
   gapi.hangout.onParticipantsAdded.add(onParticipantsAdded);
   gapi.hangout.data.onStateChanged.add(onStateChanged);
   updateParticipants();
+  updateActivities();
+  createDebugButton();
 }
 
 gadgets.util.registerOnLoadHandler(function () {
