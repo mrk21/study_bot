@@ -29,7 +29,7 @@ function appendActivity(activity) {
   var activities = getActivities();
   activities.push(activity);
   console.log(activities);
-  gapi.hangout.data.setvalue('activities', JSON.stringify(activities));
+  gapi.hangout.data.setValue('activities', JSON.stringify(activities));
   updateActivities();
 }
 
