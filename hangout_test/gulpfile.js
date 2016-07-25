@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
+var webpack = require('webpack');
 var ngrok = require('ngrok');
 var rename = require('gulp-rename');
 var ejs = require('gulp-ejs');
@@ -9,9 +10,29 @@ var server = browserSync.create();
 var appId = process.env['APP_ID'];
 var appUrl = null;
 
-gulp.task('build:copy', function () {
-  return gulp.src(['src/**/*', '!**/*.ejs'])
-    .pipe(gulp.dest("dist"));
+gulp.task('build:js', function (done) {
+  var config = {
+    entry: './src/app.js',
+    cache: true,
+    display: {
+      errorDetails: true
+    },
+    output: {
+      filename: './dist/app.js'
+    },
+    module: {},
+    resolve: {
+      root: [
+        './src'
+      ],
+      extensions: ['', '.js']
+    },
+    plugins: []
+  };
+  webpack(config, function (error, stats) {
+    console.log(stats.toString({colors: true, chunks: false}));
+    done();
+  });
 });
 
 gulp.task('build:ejs', function () {
@@ -23,7 +44,7 @@ gulp.task('build:ejs', function () {
     .pipe(gulp.dest("dist"));
 });
 
-gulp.task('build', ['build:copy', 'build:ejs']);
+gulp.task('build', ['build:js', 'build:ejs']);
 
 gulp.task('clean', function (done) {
   return del(['dist'], done);
