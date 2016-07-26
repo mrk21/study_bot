@@ -1,35 +1,18 @@
-var gulp = require('gulp');
-var browserSync = require('browser-sync');
-var webpack = require('webpack');
-var ngrok = require('ngrok');
-var rename = require('gulp-rename');
-var ejs = require('gulp-ejs');
-var del = require('del');
+import gulp from 'gulp';
+import webpack from 'webpack';
+import webpackConfig from 'config/webpack.config';
+import browserSync from 'browser-sync';
+import ngrok from 'ngrok';
+import rename from 'gulp-rename';
+import ejs from 'gulp-ejs';
+import del from 'del';
 
 var server = browserSync.create();
 var appId = process.env['APP_ID'];
 var appUrl = null;
 
 gulp.task('build:js', function (done) {
-  var config = {
-    entry: './src/app.js',
-    cache: true,
-    display: {
-      errorDetails: true
-    },
-    output: {
-      filename: './dist/app.js'
-    },
-    module: {},
-    resolve: {
-      root: [
-        './src'
-      ],
-      extensions: ['', '.js']
-    },
-    plugins: []
-  };
-  webpack(config, function (error, stats) {
+  webpack(webpackConfig, function (error, stats) {
     console.log(stats.toString({colors: true, chunks: false}));
     done();
   });

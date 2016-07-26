@@ -7,7 +7,7 @@
 3. `direnv allow .`
 4. `nodenv install`
 5. `npm install`
-6. `gulp`
+6. `npm start`
 
 ## Refer to
 
