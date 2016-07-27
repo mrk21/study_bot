@@ -4,10 +4,8 @@
   "description": "## Refer to",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_PATH=. gulp server",
-    "build": "NODE_PATH=. gulp build",
-    "gulp": "NODE_PATH=. gulp",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "gulp server",
+    "build": "gulp build"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +21,7 @@
     "gulp-ejs": "^2.1.2",
     "gulp-rename": "^1.2.2",
     "ngrok": "^2.2.1",
+    "require-dir": "^0.3.0",
     "webpack": "^1.13.1"
   }
 }

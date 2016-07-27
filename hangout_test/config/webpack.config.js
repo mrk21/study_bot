@@ -2,7 +2,7 @@ import webpack from 'webpack';
 import path from 'path';
 
 export default {
-  entry: './src/index.js',
+  entry: './src/app.js',
   cache: true,
   display: {
     errorDetails: true
