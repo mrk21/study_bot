@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
+import axios from 'axios';
 
 function DebugButton({ app }) {
   const onClick = () => {
@@ -99,7 +100,9 @@ class Application extends React.Component {
     gadgets.util.registerOnLoadHandler(() => {
       gapi.hangout.onApiReady.add(eventObj => {
         if (eventObj.isApiReady) {
-          this.setState({ isPrepare: true });
+          const secret = window.secret;
+          console.log(secret);
+          this.setState({ isPrepare: true, secret: secret });
         }
       });
     });
