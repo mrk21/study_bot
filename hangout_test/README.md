@@ -15,3 +15,4 @@
 * [Hangout 上でアプリケーションを構築できる Google Hangouts API の使い方（v1.1 対応版） - WebOS Goodies](http://webos-goodies.jp/archives/how_to_use_google_hangouts_api_v1_1.html)
 * [Google+ Hangout button  |  Google+ Hangouts API  |  Google Developers](https://developers.google.com/+/hangouts/button)
 * [Gulp: Useing ngrok with BrowserSync](https://gist.github.com/ahmadawais/a0509dd179ec511152c5)
+* [javascript - BrowserSync + gulp: Cross domain Cors Issue - Stack Overflow](http://stackoverflow.com/questions/30839811/browsersync-gulp-cross-domain-cors-issue)

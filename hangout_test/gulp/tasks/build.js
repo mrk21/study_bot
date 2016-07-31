@@ -14,7 +14,7 @@ gulp.task('build:js', done =>
 
 gulp.task('build:ejs', () =>
   gulp.src("src/**/*.ejs")
-    .pipe(ejs({ appId: gulpConfig.appId, appUrl: gulpConfig.appUrl }))
+    .pipe(ejs({ appId: gulpConfig.appId, appUrl: gulpConfig.appUrl, secretServerUrl: gulpConfig.secretServerUrl }))
     .pipe(rename(path => path.extname = ''))
     .pipe(gulp.dest("dist"))
 );

@@ -4,6 +4,7 @@ import axios from 'axios';
 
 function DebugButton({ app }) {
   const onClick = () => {
+    axios.get(`${window.secretServerUrl}/secret.json`).then(res => console.log(res));
     console.log(app.getActivities());
   };
 
@@ -95,14 +96,16 @@ class ActivityList extends React.Component {
 
 class Application extends React.Component {
   componentWillMount() {
-    this.setState({ isPrepare: false });
+    this.setState({
+      isPrepare: false,
+      isAuth: false,
+      secret: {},
+    });
 
     gadgets.util.registerOnLoadHandler(() => {
       gapi.hangout.onApiReady.add(eventObj => {
         if (eventObj.isApiReady) {
-          const secret = window.secret;
-          console.log(secret);
-          this.setState({ isPrepare: true, secret: secret });
+          this.setState({ isPrepare: true });
         }
       });
     });
@@ -117,6 +120,23 @@ class Application extends React.Component {
   }
 
   render() {
+    if (!this.state.isAuth) {
+      const onClick = () => {
+        axios.get(`${window.secretServerUrl}/secret.json`).then(res => {
+          const secret = res.data;
+          console.log(secret);
+          this.setState({ isAuth: true, secret });
+        });
+      };
+      return (
+        <div>
+          <h1>Hello World!</h1>
+          <h2>Login</h2>
+          <button type="button" onClick={onClick}>Auth</button>
+        </div>
+      );
+    }
+
     const content = !this.state.isPrepare ? (
       <p>Now loading...</p>
     ) : (
