@@ -14,7 +14,13 @@ gulp.task('build:js', done =>
 
 gulp.task('build:ejs', () =>
   gulp.src("src/**/*.ejs")
-    .pipe(ejs({ appId: gulpConfig.appId, appUrl: gulpConfig.appUrl, secretServerUrl: gulpConfig.secretServerUrl }))
+    .pipe(ejs({
+      appId: gulpConfig.appId,
+      appUrl: gulpConfig.appUrl,
+      secretServerUrl: gulpConfig.secretServerUrl,
+      slackToken: gulpConfig.slackToken,
+      slackChannel: gulpConfig.slackChannel,
+    }))
     .pipe(rename(path => path.extname = ''))
     .pipe(gulp.dest("dist"))
 );

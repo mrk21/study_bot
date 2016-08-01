@@ -2,6 +2,21 @@ import React from 'react';
 import { render } from 'react-dom';
 import axios from 'axios';
 
+let Slack = {
+  token: null,
+  channel: null,
+
+  sendMessage(text) {
+    return axios.get('https://slack.com/api/chat.postMessage', {
+      token: this.token,
+      channel: this.channel,
+      username: 'hangout',
+      text: text,
+      as_user: false,
+    });
+  }
+};
+
 function DebugButton({ app }) {
   const onClick = () => {
     axios.get(`${window.secretServerUrl}/secret.json`).then(res => console.log(res));
@@ -76,6 +91,7 @@ class ActivityList extends React.Component {
     this.setState({
       activities: activities
     });
+    Slack.sendMessage(activity);
   }
 
   onStateChanged(addedKeys, metadata, removedKeys, state) {
@@ -124,7 +140,9 @@ class Application extends React.Component {
       const onClick = () => {
         axios.get(`${window.secretServerUrl}/secret.json`).then(res => {
           const secret = res.data;
-          console.log(secret);
+          Slack.token = secret.slackToken;
+          Slack.channel = secret.slackChannel;
+          Slack.sendMessage('init');
           this.setState({ isAuth: true, secret });
         });
       };
