@@ -8,11 +8,13 @@ let Slack = {
 
   sendMessage(text) {
     return axios.get('https://slack.com/api/chat.postMessage', {
-      token: this.token,
-      channel: this.channel,
-      username: 'hangout',
-      text: text,
-      as_user: false,
+      params: {
+        token: this.token,
+        channel: this.channel,
+        username: 'hangout_test',
+        text: text,
+        as_user: false,
+      }
     });
   }
 };
