@@ -1,3 +1,5 @@
 export APP_ID= # Your Google API Project ID
 export SLACK_TOKEN= # Your Slack token
 export SLACK_CHANNEL= # Your Slack Channel
+export GOOGLE_OAUTH_TOKEN= # Your Google OAuth token
+export GOOGLE_OAUTH_SECRET= # Your Google OAuth secret
