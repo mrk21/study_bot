@@ -2,45 +2,67 @@ import gulp from 'gulp';
 import browserSync from 'browser-sync';
 import ngrok from 'ngrok';
 import * as gulpConfig from 'gulp/config';
+import google from 'googleapis';
+import { parse } from 'url';
 
+const OAuth2 = google.auth.OAuth2;
 const server = browserSync.create();
 const secretServer = browserSync.create();
 
 gulp.task('server', ['build'], done => {
-  secretServer.init({
-    port: 9000,
-    https: true,
-    open: false,
+  server.init({
+    port: 8000,
+    browser: 'Google Chrome',
     server: {
       baseDir: 'dist',
-      middleware: [
-        // CORS
-        (req, res, next) => {
-          res.setHeader('Access-Control-Allow-Origin', '*');
-          next();
+    },
+    middleware: [
+      (req, res, next) => {
+        const url = parse(req.url, true);
+        console.log(gulpConfig);
+        switch (url.pathname) {
+          case '/auth':
+            const oauth2Client = new OAuth2(
+              gulpConfig.googleOAuthToken,
+              gulpConfig.googleOAuthSecret,
+              `${gulpConfig.secretServerUrl}/oauth2callback`
+            );
+            const scopes = [
+              'https://www.googleapis.com/auth/plus.me',
+              'https://www.googleapis.com/auth/calendar'
+            ];
+            const redirectUrl = oauth2Client.generateAuthUrl({
+              access_type: 'online',
+              scope: scopes
+            });
+            console.log('GET /auth', redirectUrl);
+            res.statusCode = 303;
+            res.setHeader('Location', redirectUrl);
+            res.end();
+            return;
+          case '/oauth2callback':
+            console.log('GET /oauth2callback', url.query.code);
+            gulpConfig.googleOAuthCode = url.query.code;
+            res.statusCode = 200;
+            res.write('ok!');
+            res.end();
+          default:
+            console.log(url.path);
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            next();
         }
-      ]
-    }
+      }
+    ]
   }, (err, bs) => {
     console.log(err);
-    gulpConfig.secretServerUrl = `https://localhost:${bs.options.get('port')}`;
-
-    server.init({
-      port: 8000,
-      browser: 'Google Chrome',
-      server: {
-        baseDir: 'dist',
-      },
-    }, (err, bs) => {
-      console.log(err);
-      ngrok.connect(bs.options.get('port'), (err, url) => {
-        console.log(err, url);
-        gulpConfig.appUrl = url;
-        gulp.start('build', () => {
-          setTimeout(server.reload, 1500);
-        });
-        done();
+    ngrok.connect(bs.options.get('port'), (err, url) => {
+      console.log(err, url);
+      gulpConfig.appUrl = url;
+      gulpConfig.secretServerUrl = url;
+      gulp.start('build', () => {
+        setTimeout(server.reload, 1500);
       });
+      done();
     });
   });
 
