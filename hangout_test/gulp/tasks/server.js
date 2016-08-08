@@ -7,7 +7,6 @@ import { parse } from 'url';
 
 const OAuth2 = google.auth.OAuth2;
 const server = browserSync.create();
-const secretServer = browserSync.create();
 
 gulp.task('server', ['build'], done => {
   server.init({
@@ -19,9 +18,8 @@ gulp.task('server', ['build'], done => {
     middleware: [
       (req, res, next) => {
         const url = parse(req.url, true);
-        console.log(gulpConfig);
         switch (url.pathname) {
-          case '/auth':
+          case '/login': {
             const oauth2Client = new OAuth2(
               gulpConfig.googleOAuthToken,
               gulpConfig.googleOAuthSecret,
@@ -31,25 +29,48 @@ gulp.task('server', ['build'], done => {
               'https://www.googleapis.com/auth/plus.me',
               'https://www.googleapis.com/auth/calendar'
             ];
-            const redirectUrl = oauth2Client.generateAuthUrl({
-              access_type: 'online',
-              scope: scopes
-            });
-            console.log('GET /auth', redirectUrl);
+            const access_type = 'online';
+            const authUrl = oauth2Client.generateAuthUrl({ access_type, scope });
+            console.log('GET /login', authUrl);
             res.statusCode = 303;
-            res.setHeader('Location', redirectUrl);
+            res.setHeader('Location', authUrl);
             res.end();
             return;
-          case '/oauth2callback':
+          }
+          case '/oauth2callback': {
             console.log('GET /oauth2callback', url.query.code);
             gulpConfig.googleOAuthCode = url.query.code;
-            res.statusCode = 200;
-            res.write('ok!');
+            res.statusCode = 303;
+            res.setHeader('Location', '/');
             res.end();
-          default:
-            console.log(url.path);
+            return;
+          }
+          case '/logout': {
+            gulpConfig.googleOAuthCode = null;
+            res.statusCode = 303;
+            res.setHeader('Location', '/');
+            res.end();
+            return;
+          }
+          case '/secret.json': {
+            console.log('GET /secret.json', gulpConfig);
             res.setHeader('Access-Control-Allow-Origin', '*');
+            if (gulpConfig.googleOAuthCode) {
+              next();
+            }
+            else {
+              res.statusCode = 401;
+              res.setHeader('Content-Type', 'application/json');
+              res.write('{"error": "Not authentication"}');
+              res.end();
+            }
+            return;
+          }
+          default: {
+            console.log(url.path);
             next();
+            return;
+          }
         }
       }
     ]
