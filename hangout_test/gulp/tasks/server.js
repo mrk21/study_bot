@@ -30,7 +30,7 @@ gulp.task('server', ['build'], done => {
               'https://www.googleapis.com/auth/calendar'
             ];
             const access_type = 'online';
-            const authUrl = oauth2Client.generateAuthUrl({ access_type, scope });
+            const authUrl = oauth2Client.generateAuthUrl({ access_type, scopes });
             console.log('GET /login', authUrl);
             res.statusCode = 303;
             res.setHeader('Location', authUrl);
