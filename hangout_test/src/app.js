@@ -123,7 +123,9 @@ class Application extends React.Component {
     gadgets.util.registerOnLoadHandler(() => {
       gapi.hangout.onApiReady.add(eventObj => {
         if (eventObj.isApiReady) {
-          this.setState({ isPrepare: true });
+          axios.get(`${window.secretServerUrl}/secret.json`)
+            .then(() => this.setState({ isPrepare: true, isAuth: true }))
+            .catch(() => this.setState({ isPrepare: true, isAuth: false }));
         }
       });
     });
@@ -140,13 +142,19 @@ class Application extends React.Component {
   render() {
     if (!this.state.isAuth) {
       const onClick = () => {
-        axios.get(`${window.secretServerUrl}/secret.json`).then(res => {
-          const secret = res.data;
-          Slack.token = secret.slackToken;
-          Slack.channel = secret.slackChannel;
-          Slack.sendMessage('init');
-          this.setState({ isAuth: true, secret });
-        });
+        const authWindow = window.open(`${window.secretServerUrl}/login`, '_blank', 'width=800,height=600');
+        const authWindowIntervalId = setInterval(() => {
+          if (authWindow.closed) {
+            clearInterval(authWindowIntervalId);
+            axios.get(`${window.secretServerUrl}/secret.json`).then(res => {
+              const secret = res.data;
+              Slack.token = secret.slackToken;
+              Slack.channel = secret.slackChannel;
+              Slack.sendMessage('init');
+              this.setState({ isAuth: true, secret });
+            });
+          }
+        }, 200);
       };
       return (
         <div>

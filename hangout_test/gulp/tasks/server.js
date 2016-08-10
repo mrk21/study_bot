@@ -23,26 +23,24 @@ gulp.task('server', ['build'], done => {
             const oauth2Client = new OAuth2(
               gulpConfig.googleOAuthToken,
               gulpConfig.googleOAuthSecret,
-              `${gulpConfig.secretServerUrl}/oauth2callback`
+              `${gulpConfig.secretServerUrl}/oauth2callback.html`
             );
-            const scopes = [
+            const scope = [
               'https://www.googleapis.com/auth/plus.me',
               'https://www.googleapis.com/auth/calendar'
             ];
             const access_type = 'online';
-            const authUrl = oauth2Client.generateAuthUrl({ access_type, scopes });
+            const authUrl = oauth2Client.generateAuthUrl({ access_type, scope });
             console.log('GET /login', authUrl);
             res.statusCode = 303;
             res.setHeader('Location', authUrl);
             res.end();
             return;
           }
-          case '/oauth2callback': {
-            console.log('GET /oauth2callback', url.query.code);
+          case '/oauth2callback.html': {
+            console.log('GET /oauth2callback.html', url.query.code);
             gulpConfig.googleOAuthCode = url.query.code;
-            res.statusCode = 303;
-            res.setHeader('Location', '/');
-            res.end();
+            next();
             return;
           }
           case '/logout': {
