@@ -6,4 +6,3 @@ export const googleOAuthSecret = process.env['GOOGLE_OAUTH_SECRET'];
 
 export let appUrl = null;
 export let secretServerUrl = null;
-export let googleOAuthCode = null;

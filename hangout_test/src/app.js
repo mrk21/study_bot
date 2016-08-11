@@ -8,21 +8,23 @@ let Slack = {
 
   sendMessage(text) {
     return axios.get('https://slack.com/api/chat.postMessage', {
+      withCredentials: true,
       params: {
         token: this.token,
         channel: this.channel,
         username: 'hangout_test',
         text: text,
         as_user: false,
-      }
+      },
     });
   }
 };
 
 function DebugButton({ app }) {
   const onClick = () => {
-    axios.get(`${window.secretServerUrl}/secret.json`).then(res => console.log(res));
+    axios.get(`${window.secretServerUrl}/secret.json`, { withCredentials: true }).then(res => console.log(res));
     console.log(app.getActivities());
+    console.log('data', gapi.hangout.data.getState());
   };
 
   return (
@@ -54,8 +56,8 @@ class ParticipantList extends React.Component {
   render() {
     return (
       <ul id="participants">
-      {this.state.participants.map(participant => 
-        <li>{participant.person.displayName}</li>
+      {this.state.participants.map((participant, i) => 
+        <li key={i}>{participant.person.displayName}</li>
       )}
       </ul>
     );
@@ -104,8 +106,8 @@ class ActivityList extends React.Component {
   render() {
     return (
       <ol id="participants">
-      {this.state.activities.map(activity => 
-        <li>{activity}</li>
+      {this.state.activities.map((activity, i) => 
+        <li key={i}>{activity}</li>
       )}
       </ol>
     );
@@ -123,7 +125,7 @@ class Application extends React.Component {
     gadgets.util.registerOnLoadHandler(() => {
       gapi.hangout.onApiReady.add(eventObj => {
         if (eventObj.isApiReady) {
-          axios.get(`${window.secretServerUrl}/secret.json`)
+          axios.get(`${window.secretServerUrl}/secret.json`, { withCredentials: true })
             .then(() => this.setState({ isPrepare: true, isAuth: true }))
             .catch(() => this.setState({ isPrepare: true, isAuth: false }));
         }
@@ -146,7 +148,7 @@ class Application extends React.Component {
         const authWindowIntervalId = setInterval(() => {
           if (authWindow.closed) {
             clearInterval(authWindowIntervalId);
-            axios.get(`${window.secretServerUrl}/secret.json`).then(res => {
+            axios.get(`${window.secretServerUrl}/secret.json`, { withCredentials: true }).then(res => {
               const secret = res.data;
               Slack.token = secret.slackToken;
               Slack.channel = secret.slackChannel;
