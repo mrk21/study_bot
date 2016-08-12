@@ -1,14 +1,12 @@
 import gulp from 'gulp';
 import browserSync from 'browser-sync';
 import ngrok from 'ngrok';
-import * as gulpConfig from 'gulp/config';
 import google from 'googleapis';
 import { parse } from 'url';
 import crypto from 'crypto';
+import * as gulpConfig from 'gulp/config';
 
-const OAuth2 = google.auth.OAuth2;
 const server = browserSync.create();
-const sessionStore = {};
 
 gulp.task('server', ['build'], done => {
   server.init({
@@ -18,8 +16,8 @@ gulp.task('server', ['build'], done => {
       baseDir: 'dist',
     },
     middleware: [
-      corsMiddleware,
-      routingMiddleware,
+      CORSMiddleware,
+      RoutingMiddleware,
     ]
   }, (err, bs) => {
     console.log(err);
@@ -41,56 +39,17 @@ gulp.task('server', ['build'], done => {
   });
 });
 
-function setSession(res, token) {
-  console.log('[session store]', sessionStore);
-  console.log('[token]', token);
 
-  const shasum = crypto.createHash('sha1');
-  shasum.update(token);
-  const hashedToken = shasum.digest('hex');
-  console.log('[hashed token]', hashedToken);
-  sessionStore[hashedToken] = { token };
-
-  let expire = new Date;
-  expire.setDate(expire.getDate() + 1);
-  expire = expire.toUTCString();
-  res.setHeader('Set-Cookie', `hangout_test_token=${hashedToken}; path=/; expires=${expire}; HttpOnly`);
-}
-
-function getSession(req) {
-  console.log('[session store]', sessionStore);
-  return sessionStore[getSessionToken(req)] || {};
-}
-
-function deleteSession(req, res) {
-  console.log('[session store]', sessionStore);
-  delete sessionStore[getSessionToken(req)];
-
-  let expire = new Date;
-  expire.setDate(expire.getDate() - 1);
-  expire = expire.toUTCString();
-  res.setHeader('Set-Cookie', `hangout_test_token=; path=/; expires=${expire}; HttpOnly`);
-}
-
-function getSessionToken(req) {
-  console.log('[raw cookie]', req.headers['cookie']);
-  const cookie = (req.headers['cookie'] || '')
-    .split(';')
-    .map(v => (v || '').split('=').map(v => v.trim()))
-    .reduce((h,[k,v]) => (h[k]=v, h), {});
-  console.log('[cookie]', cookie);
-  return cookie.hangout_test_token;
-}
-
-function corsMiddleware(req, res, next) {
+// Middlewares
+function CORSMiddleware(req, res, next) {
   const origin = req.headers['origin'] || '';
-  const allowHostPatterns = [
+  const allowedOriginPatterns = [
     /^(http|https):\/\/127.0.0.1(:[0-9]+)?$/,
     /^(http|https):\/\/localhost(:[0-9]+)?$/,
     /^(http|https):\/\/([^-]+)-a-hangout-opensocial.googleusercontent.com(:[0-9]+)?$/,
   ];
   console.log('[Origin]', origin);
-  if (allowHostPatterns.some(pattern => origin.match(pattern))) {
+  if (allowedOriginPatterns.some(pattern => origin.match(pattern))) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS, DELETE, PATCH');
@@ -100,12 +59,12 @@ function corsMiddleware(req, res, next) {
   next();
 }
 
-function routingMiddleware(req, res, next) {
+function RoutingMiddleware(req, res, next) {
   const url = parse(req.url, true);
-  getSessionToken(req);
+  getCookie(req);
   switch (url.pathname) {
     case '/login': {
-      const oauth2Client = new OAuth2(
+      const oauth2Client = new google.auth.OAuth2(
         gulpConfig.googleOAuthToken,
         gulpConfig.googleOAuthSecret,
         `${gulpConfig.secretServerUrl}/oauth2callback.html`
@@ -124,15 +83,44 @@ function routingMiddleware(req, res, next) {
     }
     case '/oauth2callback.html': {
       console.log('[GET /oauth2callback.html]', url.query.code);
-      const token = url.query.code
-      setSession(res, token);
-      next();
+
+      const oauth2Client = new google.auth.OAuth2(
+        gulpConfig.googleOAuthToken,
+        gulpConfig.googleOAuthSecret,
+        `${gulpConfig.secretServerUrl}/oauth2callback.html`
+      );
+
+      (new Promise((resolve, reject) => {
+        const { code } = url.query;
+        oauth2Client.getToken(code, (err, tokens) => {
+          console.log(err, tokens);
+          if (err) reject(err);
+          else resolve(tokens);
+        });
+      })).then(tokens => {
+        oauth2Client.setCredentials(tokens);
+        oauth2Client.setCredentials(tokens);
+        return new Promise((resolve, reject) => {
+          const plus = google.plus('v1');
+          plus.people.get({ userId: 'me', auth: oauth2Client }, (err, response) => {
+            console.log(err, response);
+            if (err) reject(err);
+            else resolve(response);
+          });
+        })
+      }).then(user => {
+        setSession(res, user);
+        next();
+      }).catch(err => {
+        console.log('[error]', err);
+        next();
+      });
       return;
     }
     case '/logout': {
       console.log('[GET /logout]', gulpConfig);
-      res.statusCode = 303;
       deleteSession(req, res);
+      res.statusCode = 303;
       res.setHeader('Location', '/');
       res.end();
       return;
@@ -140,8 +128,7 @@ function routingMiddleware(req, res, next) {
     case '/secret.json': {
       console.log('[GET /secret.json]', gulpConfig);
       const session = getSession(req);
-
-      if (session.token) {
+      if (session.id) {
         next();
       }
       else {
@@ -158,4 +145,49 @@ function routingMiddleware(req, res, next) {
       return;
     }
   }
+}
+
+
+// Sessions
+const sessionStore = {};
+
+function setSession(res, user) {
+  console.log('[session store]', sessionStore);
+  console.log('[user]', user);
+
+  const shasum = crypto.createHash('sha1');
+  shasum.update(user.id);
+  const hashedUserId = shasum.digest('hex');
+  console.log('[hashed user id]', hashedUserId);
+  sessionStore[hashedUserId] = user;
+
+  let expire = new Date;
+  expire.setDate(expire.getDate() + 1);
+  expire = expire.toUTCString();
+  res.setHeader('Set-Cookie', `hangout_test_token=${hashedUserId}; path=/; expires=${expire}; HttpOnly`);
+}
+
+function getSession(req) {
+  console.log('[session store]', sessionStore);
+  return sessionStore[getCookie(req).hangout_test_token] || {};
+}
+
+function deleteSession(req, res) {
+  console.log('[session store]', sessionStore);
+  delete sessionStore[getCookie(req).hangout_test_token];
+
+  let expire = new Date;
+  expire.setDate(expire.getDate() - 1);
+  expire = expire.toUTCString();
+  res.setHeader('Set-Cookie', `hangout_test_token=; path=/; expires=${expire}; HttpOnly`);
+}
+
+function getCookie(req) {
+  console.log('[raw cookie]', req.headers['cookie']);
+  const cookie = (req.headers['cookie'] || '')
+    .split(';')
+    .map(pair => (pair || '').split('=').map(element => element.trim()))
+    .reduce((hash, [key, value]) => (hash[key] = value, hash), {});
+  console.log('[cookie]', cookie);
+  return cookie;
 }

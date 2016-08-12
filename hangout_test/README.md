@@ -17,6 +17,7 @@
 * [Gulp: Useing ngrok with BrowserSync](https://gist.github.com/ahmadawais/a0509dd179ec511152c5)
 * [javascript - BrowserSync + gulp: Cross domain Cors Issue - Stack Overflow](http://stackoverflow.com/questions/30839811/browsersync-gulp-cross-domain-cors-issue)
 * [google/google-api-nodejs-client: Google's officially supported Node.js client library for accessing Google APIs. Support for authorization and authentication with OAuth 2.0, API Keys and JWT (Service Tokens) is included. API Reference Docs: http://google.github.io/google-api-nodejs-client/](https://github.com/google/google-api-nodejs-client)
+* [Google アカウントの認証を OpenID から OpenID Connect に移行する方法 - WebOS Goodies](http://webos-goodies.jp/archives/how_to_migrate_from_openid_to_openid_connect.html)
 
 ### CORS
 

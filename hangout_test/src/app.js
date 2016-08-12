@@ -145,6 +145,7 @@ class Application extends React.Component {
     if (!this.state.isAuth) {
       const onClick = () => {
         const authWindow = window.open(`${window.secretServerUrl}/login`, '_blank', 'width=800,height=600');
+
         const authWindowIntervalId = setInterval(() => {
           if (authWindow.closed) {
             clearInterval(authWindowIntervalId);
@@ -162,26 +163,33 @@ class Application extends React.Component {
         <div>
           <h1>Hello World!</h1>
           <h2>Login</h2>
-          <button type="button" onClick={onClick}>Auth</button>
+          <button type="button" onClick={onClick}>Login</button>
         </div>
       );
     }
-
-    const content = !this.state.isPrepare ? (
-      <p>Now loading...</p>
-    ) : (
-      <div>
-        <ParticipantList app={this} />
-        <ActivityList app={this} ref='activities' />
-      </div>
-    );
-    return (
-      <div>
-        <h1>Hello World!</h1>
-        {content}
-        <DebugButton app={this} />
-      </div>
-    );
+    else {
+      const content = !this.state.isPrepare ? (
+        <p>Now loading...</p>
+      ) : (
+        <div>
+          <ParticipantList app={this} />
+          <ActivityList app={this} ref='activities' />
+        </div>
+      );
+      const onClick = () => {
+        axios.get(`${window.secretServerUrl}/logout`, { withCredentials: true }).then(() => {
+          this.setState({ isAuth: false });
+        });
+      };
+      return (
+        <div>
+          <h1>Hello World!</h1>
+          {content}
+          <DebugButton app={this} />
+          <button type="button" onClick={onClick}>Logout</button>
+        </div>
+      );
+    }
   }
 }
 
