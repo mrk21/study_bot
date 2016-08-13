@@ -5,6 +5,7 @@ import google from 'googleapis';
 import { parse } from 'url';
 import crypto from 'crypto';
 import * as gulpConfig from 'gulp/config';
+import axios from 'axios';
 
 const server = browserSync.create();
 
@@ -89,6 +90,7 @@ function RoutingMiddleware(req, res, next) {
         gulpConfig.googleOAuthSecret,
         `${gulpConfig.secretServerUrl}/oauth2callback.html`
       );
+      let loginTicket = null;
 
       (new Promise((resolve, reject) => {
         const { code } = url.query;
@@ -98,21 +100,34 @@ function RoutingMiddleware(req, res, next) {
           else resolve(tokens);
         });
       })).then(tokens => {
+        console.log(tokens);
         oauth2Client.setCredentials(tokens);
-        oauth2Client.setCredentials(tokens);
+        console.log(oauth2Client.credentials);
+
         return new Promise((resolve, reject) => {
-          const plus = google.plus('v1');
-          plus.people.get({ userId: 'me', auth: oauth2Client }, (err, response) => {
+          oauth2Client.verifyIdToken(oauth2Client.credentials.id_token, gulpConfig.googleOAuthToken, (err, response) => {
             console.log(err, response);
             if (err) reject(err);
             else resolve(response);
           });
-        })
-      }).then(user => {
-        setSession(res, user);
+        });
+      }).then(_loginTicket => {
+        loginTicket = _loginTicket;
+        console.log(loginTicket);
+
+        return axios.get('https://www.googleapis.com/plus/v1/people/me/openIdConnect', {
+          headers: {
+            'Authorization': `OAuth ${oauth2Client.credentials.access_token}`
+          }
+        });
+      }).then(response => {
+        const user = response.data;
+        console.log(user);
+        setSession(res, { loginTicket, user });
         next();
       }).catch(err => {
         console.log('[error]', err);
+        res.statusCode = 400;
         next();
       });
       return;
@@ -128,7 +143,7 @@ function RoutingMiddleware(req, res, next) {
     case '/secret.json': {
       console.log('[GET /secret.json]', gulpConfig);
       const session = getSession(req);
-      if (session.id) {
+      if (session) {
         next();
       }
       else {
@@ -156,7 +171,7 @@ function setSession(res, user) {
   console.log('[user]', user);
 
   const shasum = crypto.createHash('sha1');
-  shasum.update(user.id);
+  shasum.update(user.sub);
   const hashedUserId = shasum.digest('hex');
   console.log('[hashed user id]', hashedUserId);
   sessionStore[hashedUserId] = user;
