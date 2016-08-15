@@ -7,11 +7,35 @@
 <body>
   <h1>Hello World</h1>
   <ol>
-    <li>Set <a href="<%= appUrl %>/app.xml" target="__blank"><%= appUrl %>/app.xml</a> to Application URL on Hangout API setting page</li>
+    <li>Set
+      <a
+        id="app_url"
+        href="<%= appUrl %>/app.xml"
+        data-clipboard-text="<%= appUrl %>/app.xml"
+        target="__blank"
+      >
+        <%= appUrl %>/app.xml
+      </a>
+      <button class="btn" data-clipboard-target="#app_url">Copy</button>
+      to Application URL on Hangout API setting page
+    </li>
     <li>Click <span class="g-hangout" data-render="createhangout" data-initial_apps="[{ app_id: '<%= appId %>', app_type: 'LOCAL_APP' }]"></span></li>
   </ol>
-  <a href="#" onClick="window.open('/login', '_blank', 'width=800,height=600');">login</a>
-  <a href="/logout">logout</a>
+  <a href="#" onClick="window.open('<%= appUrl %>/login', '_blank', 'width=800,height=600');">login</a>
+  <a href="<%= appUrl %>/logout">logout</a>
+
   <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="/node_modules/clipboard/dist/clipboard.js"></script>
+  <script>
+    window.onload = function() {
+      var clipboard = new Clipboard('.btn');
+      clipboard.on('success', function(e) {
+          console.log(e);
+      });
+      clipboard.on('error', function(e) {
+          console.log(e);
+      });
+    }
+  </script>
 </body>
 </html>

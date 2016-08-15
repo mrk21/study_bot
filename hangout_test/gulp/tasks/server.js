@@ -112,7 +112,7 @@ function RoutingMiddleware(req, res, next) {
           });
         });
       }).then(_loginTicket => {
-        loginTicket = _loginTicket;
+        loginTicket = _loginTicket.getAttributes();
         console.log(loginTicket);
 
         return axios.get('https://www.googleapis.com/plus/v1/people/me/openIdConnect', {
@@ -121,9 +121,9 @@ function RoutingMiddleware(req, res, next) {
           }
         });
       }).then(response => {
-        const user = response.data;
-        console.log(user);
-        setSession(res, { loginTicket, user });
+        const profile = response.data;
+        console.log(profile);
+        setSession(res, { loginTicket, profile });
         next();
       }).catch(err => {
         console.log('[error]', err);
@@ -171,13 +171,12 @@ function setSession(res, user) {
   console.log('[user]', user);
 
   const shasum = crypto.createHash('sha1');
-  shasum.update(user.sub);
+  shasum.update(user.loginTicket.payload.sub);
   const hashedUserId = shasum.digest('hex');
   console.log('[hashed user id]', hashedUserId);
   sessionStore[hashedUserId] = user;
 
-  let expire = new Date;
-  expire.setDate(expire.getDate() + 1);
+  let expire = new Date(user.loginTicket.payload.exp * 1000);
   expire = expire.toUTCString();
   res.setHeader('Set-Cookie', `hangout_test_token=${hashedUserId}; path=/; expires=${expire}; HttpOnly`);
 }
