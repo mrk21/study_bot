@@ -20,6 +20,8 @@
 * [google/google-api-nodejs-client: Google's officially supported Node.js client library for accessing Google APIs. Support for authorization and authentication with OAuth 2.0, API Keys and JWT (Service Tokens) is included. API Reference Docs: http://google.github.io/google-api-nodejs-client/](https://github.com/google/google-api-nodejs-client)
 * [Google アカウントの認証を OpenID から OpenID Connect に移行する方法 - WebOS Goodies](http://webos-goodies.jp/archives/how_to_migrate_from_openid_to_openid_connect.html)
 * [Working with 'Google Sign-In for Websites' as a solution for single-sign on auth for a web app. Basically we have a front-end in React and a backend supported by AWS API Gateway + Lambda + DynamoDB. I'm following the directions here: . To verify the id_token that my client-side gets from Googl... | Hackit](http://hackit.edward.io/p/95061)
+* [OpenID ConnectとAndroidアプリのログインサイクル](http://www.slideshare.net/kura_lab/openid-connect-and-login-cycle-for-android-apps)
+* [Twitterアカウントで認証するAPIサーバをどう作るか](http://blog.wktk.co.jp/ja/entry/2016/02/25/login-with-twitter-platfome-design)
 
 ### CORS
 

@@ -105,10 +105,10 @@ function RoutingMiddleware(req, res, next) {
         console.log(oauth2Client.credentials);
 
         return new Promise((resolve, reject) => {
-          oauth2Client.verifyIdToken(oauth2Client.credentials.id_token, gulpConfig.googleOAuthToken, (err, response) => {
-            console.log(err, response);
+          oauth2Client.verifyIdToken(oauth2Client.credentials.id_token, gulpConfig.googleOAuthToken, (err, loginTicket) => {
+            console.log(err, loginTicket);
             if (err) reject(err);
-            else resolve(response);
+            else resolve(loginTicket);
           });
         });
       }).then(_loginTicket => {
@@ -121,9 +121,10 @@ function RoutingMiddleware(req, res, next) {
           }
         });
       }).then(response => {
+        const { credentials } = oauth2Client;
         const profile = response.data;
         console.log(profile);
-        setSession(res, { loginTicket, profile });
+        setSession(res, { credentials, loginTicket, profile });
         next();
       }).catch(err => {
         console.log('[error]', err);
