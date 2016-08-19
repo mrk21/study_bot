@@ -242,3 +242,4 @@ you're having issues.
 
 * [dependencies - package.json | npm Documentation](https://docs.npmjs.com/files/package.json#dependencies)
 * [ライブラリをES6で書いて公開する所から始めよう | Web Scratch](http://efcl.info/2015/01/09/write-es6/)
+* [postinstall - Node.jsユーザーなら押さえておきたいnpm-scriptsのタスク実行方法まとめ - ICS MEDIA](https://ics.media/entry/12226)
