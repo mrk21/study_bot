@@ -4,6 +4,12 @@ export default robot => {
   robot.router.set('trust proxy', 1); // trust first proxy
   robot.router.use(session({
     secret: 'keyboard cat',
+    cookie: {
+      path: '/',
+      httpOnly: true,
+      secure: false,
+      maxAge: 60000,
+    },
   }));
 
   // $ curl http://localhost:8080/endpoint_test
