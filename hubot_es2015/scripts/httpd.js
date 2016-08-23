@@ -1,9 +1,13 @@
 import session from 'express-session';
+import connectRedis from 'connect-redis';
+
+const RedisStore = connectRedis(session);
 
 export default robot => {
   robot.router.set('trust proxy', 1); // trust first proxy
   robot.router.use(session({
     secret: 'keyboard cat',
+    store: new RedisStore(),
     cookie: {
       path: '/',
       httpOnly: true,

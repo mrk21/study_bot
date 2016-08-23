@@ -240,3 +240,4 @@ you're having issues.
 ### Express
 
 * [expressjs/session: Simple session middleware for Express](https://github.com/expressjs/session)
+* [tj/connect-redis: Redis session store for Connect](https://github.com/tj/connect-redis)
