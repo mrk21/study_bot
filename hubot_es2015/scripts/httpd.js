@@ -25,4 +25,11 @@ export default robot => {
     robot.messageRoom('hubot_test', 'received http request');
     res.end(`hubot httpd test: ${req.session.views}`);
   });
+
+  robot.router.get('/logout', (req, res) => {
+    req.session.destroy(function(err) {
+      console.log(err);
+      res.redirect('/endpoint_test');
+    });
+  });
 };
